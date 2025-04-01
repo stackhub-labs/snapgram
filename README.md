@@ -19,5 +19,3 @@
     - 댓글(숫자, 댓글 단 사람 계정)
 - 검색 기능
     - 계정 검색
-
-  ![Untitled (1)](https://github.com/user-attachments/assets/973d1581-ce02-48dd-bbb6-a9a0cb7d7082)
