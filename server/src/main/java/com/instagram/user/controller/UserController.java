@@ -69,4 +69,24 @@ public class UserController {
                     .body(Map.of("code", ErrorCode.INTERNAL_SERVER_ERROR, "message", "예상치 못한 오류가 발생했습니다."));
         }
     }
+
+    @PostMapping("/find_password")
+    public ResponseEntity<Object> findPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String tempPassword = userService.resetPassword(email);
+            return ResponseEntity.ok().body(Map.of(
+                    "code", ErrorCode.SUCCESS,
+                    "data", Map.of("temp_password", tempPassword)
+            ));
+        } catch (IllegalArgumentException e) {
+            String message = e.getMessage();
+            if (message.contains("User not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("code", ErrorCode.USER_NOT_FOUND, "message", "사용자를 찾을 수 없습니다."));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("code", ErrorCode.INTERNAL_SERVER_ERROR, "message", "예상치 못한 오류가 발생했습니다."));
+        }
+    }
 }

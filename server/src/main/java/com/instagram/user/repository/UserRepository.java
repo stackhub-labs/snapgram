@@ -52,4 +52,9 @@ public class UserRepository {
             return null;
         }
     }
+
+    public void updatePassword(User user) {
+        String query = "UPDATE user SET password = ? WHERE email = ?";
+        jdbcTemplate.update(query, user.getPassword(), user.getEmail());
+    }
 }

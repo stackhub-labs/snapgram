@@ -10,11 +10,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import com.instagram.config.JwtProperties;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Date;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -100,5 +100,48 @@ public class UserService {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact();
+    }
+
+    public String resetPassword(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        String tempPassword = generateTempPassword();
+
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.updatePassword(user);
+
+        return tempPassword;
+    }
+
+    private String generateTempPassword() {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String special = "!@#$%^&*()-_+=<>?";
+        String all = upper + lower + digits + special;
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder();
+
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(special.charAt(random.nextInt(special.length())));
+
+        for (int i = 4; i < 10; i++) {
+            password.append(all.charAt(random.nextInt(all.length())));
+        }
+
+        List<Character> pwdChars = password.chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.toList());
+        Collections.shuffle(pwdChars, random);
+
+        return pwdChars.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining());
     }
 }
