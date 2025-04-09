@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Map;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -22,7 +23,6 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@Valid @RequestBody SignUpRequest request) {
-        System.out.println("📥 [POST] /api/user/signup 요청 받음");
         try {
             userService.registerUser(request);
             return ResponseEntity.status(HttpStatus.CREATED)
