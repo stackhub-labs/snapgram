@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
 
@@ -22,6 +22,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@Valid @RequestBody SignUpRequest request) {
+        System.out.println("📥 [POST] /api/user/signup 요청 받음");
         try {
             userService.registerUser(request);
             return ResponseEntity.status(HttpStatus.CREATED)
