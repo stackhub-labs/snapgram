@@ -1,22 +1,31 @@
 package com.instagram.user.service;
 
+import com.instagram.user.dto.LoginRequest;
 import com.instagram.user.dto.SignUpRequest;
 import com.instagram.user.model.User;
 import com.instagram.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import com.instagram.config.JwtProperties;
 
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProperties jwtProperties;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtProperties = jwtProperties;
     }
 
     public boolean registerUser(SignUpRequest request) {
@@ -47,6 +56,23 @@ public class UserService {
         return true;
     }
 
+    public String loginUser(LoginRequest request) {
+        if (!isValidEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Password mismatch");
+        }
+
+        return generateToken(user);
+    }
+
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(emailRegex);
@@ -59,5 +85,63 @@ public class UserService {
         Pattern pattern = Pattern.compile(passwordRegex);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
+    }
+
+    private String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("nickname", user.getNickname());
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
+                .compact();
+    }
+
+    public String resetPassword(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        String tempPassword = generateTempPassword();
+
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.updatePassword(user);
+
+        return tempPassword;
+    }
+
+    private String generateTempPassword() {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String special = "!@#$%^&*()-_+=<>?";
+        String all = upper + lower + digits + special;
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder();
+
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(special.charAt(random.nextInt(special.length())));
+
+        for (int i = 4; i < 10; i++) {
+            password.append(all.charAt(random.nextInt(all.length())));
+        }
+
+        List<Character> pwdChars = password.chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.toList());
+        Collections.shuffle(pwdChars, random);
+
+        return pwdChars.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining());
     }
 }

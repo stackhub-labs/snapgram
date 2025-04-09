@@ -1,6 +1,7 @@
 package com.instagram.user.repository;
 
 import com.instagram.user.model.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -30,5 +31,30 @@ public class UserRepository {
                 "VALUES (?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(query, user.getName(), user.getNickname(), user.getEmail(),
                 user.getPassword(), user.getProfileImageUrl(), user.getInfo());
+    }
+
+    public User findByEmail(String email) {
+        String query = "SELECT * FROM user WHERE email = ?";
+        try {
+            return jdbcTemplate.queryForObject(query, new Object[]{email}, (rs, rowNum) -> {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setName(rs.getString("name"));
+                user.setNickname(rs.getString("nickname"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setProfileImageUrl(rs.getString("profile_image_url"));
+                user.setInfo(rs.getString("info"));
+                user.setCreatedAt(rs.getString("created_at"));
+                return user;
+            });
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public void updatePassword(User user) {
+        String query = "UPDATE user SET password = ? WHERE email = ?";
+        jdbcTemplate.update(query, user.getPassword(), user.getEmail());
     }
 }
