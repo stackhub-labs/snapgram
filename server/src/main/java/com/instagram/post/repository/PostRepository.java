@@ -16,14 +16,12 @@ public class PostRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ✅ 해당 유저의 게시글 수
     public int countByUserId(Long userId) {
         String sql = "SELECT COUNT(*) FROM post WHERE user_id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class);
         return count != null ? count : 0;
     }
 
-    // ✅ 해당 유저의 게시글 요약 목록 (id, image_url만)
     public List<Map<String, Object>> findPostSummariesByUserId(Long userId) {
         String sql = "SELECT id, image_url FROM post WHERE user_id = ?";
         return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) -> mapToPostSummary(rs));
