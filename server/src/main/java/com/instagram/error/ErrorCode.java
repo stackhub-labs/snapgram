@@ -10,6 +10,10 @@ public class ErrorCode {
     public static final int TERMS_NOT_ACCEPTED = 1005;
     public static final int USER_NOT_FOUND = 1006;
     public static final int PASSWORD_MISMATCH = 1007;
+    public static final int NO_USERS_FOUND = 1008;
+    public static final int BAD_REQUEST = 1009;
 
-    public static final int INTERNAL_SERVER_ERROR = 2000;
+    public static final int INTERNAL_SERVER_ERROR = 2001;
+
+    public static final int UNAUTHORIZED = 3001;
 }

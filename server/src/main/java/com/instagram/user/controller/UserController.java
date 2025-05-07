@@ -3,13 +3,17 @@ package com.instagram.user.controller;
 import com.instagram.error.ErrorCode;
 import com.instagram.user.dto.LoginRequest;
 import com.instagram.user.dto.SignUpRequest;
+import com.instagram.user.model.User;
 import com.instagram.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -92,4 +96,50 @@ public class UserController {
                     .body(Map.of("code", ErrorCode.INTERNAL_SERVER_ERROR, "message", "예상치 못한 오류가 발생했습니다."));
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Object> searchUsers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String nickname
+    ) {
+        try {
+            String query = name != null ? name : nickname;
+
+            if (query == null || query.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "code", ErrorCode.BAD_REQUEST,
+                        "message", "name 또는 nickname 파라미터가 필요합니다."
+                ));
+            }
+
+            List<User> users = userService.searchUsersByNameOrNickname(query);
+            List<Map<String, Object>> responseUsers = users.stream()
+                    .map(user -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("id", user.getId());
+                        map.put("username", user.getName());
+                        map.put("nickname", user.getNickname());
+                        map.put("profile_image_url", user.getProfileImageUrl());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            if (responseUsers.isEmpty()) {
+                return ResponseEntity.ok().body(Map.of(
+                        "code", ErrorCode.NO_USERS_FOUND,
+                        "data", Map.of("users", List.of()),
+                        "message", "일치하는 사용자가 없습니다."
+                ));
+            }
+
+            return ResponseEntity.ok().body(Map.of(
+                    "code", ErrorCode.SUCCESS,
+                    "data", Map.of("users", responseUsers)
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("code", ErrorCode.INTERNAL_SERVER_ERROR, "message", "예상치 못한 오류가 발생했습니다."));
+        }
+    }
+
 }

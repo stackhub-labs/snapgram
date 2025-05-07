@@ -144,4 +144,8 @@ public class UserService {
                 .map(String::valueOf)
                 .collect(Collectors.joining());
     }
+
+    public List<User> searchUsersByNameOrNickname(String query) {
+        return userRepository.findByNameOrNickname(query);
+    }
 }
