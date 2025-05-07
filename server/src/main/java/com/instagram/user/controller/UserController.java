@@ -142,4 +142,24 @@ public class UserController {
         }
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<Object> getUserProfile(@RequestParam("user_id") Long userId) {
+        try {
+            Map<String, Object> response = userService.getUserProfileById(userId);
+
+            return ResponseEntity.ok().body(Map.of(
+                    "code", ErrorCode.SUCCESS,
+                    "data", response
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("code", ErrorCode.USER_NOT_FOUND, "message", "사용자를 찾을 수 없습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("code", ErrorCode.INTERNAL_SERVER_ERROR, "message", "예상치 못한 오류가 발생했습니다."));
+        }
+    }
+
+
+
 }

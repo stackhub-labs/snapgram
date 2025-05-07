@@ -1,12 +1,12 @@
 package com.instagram.user.repository;
 
-import com.instagram.user.model.User;
+import com.instagram.user.model.User; // ✅ 이 줄 추가
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
 @Repository
 public class UserRepository {
 
@@ -15,6 +15,19 @@ public class UserRepository {
     public UserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    private static final RowMapper<User> USER_ROW_MAPPER = (rs, rowNum) -> {
+        User user = new User();
+        user.setId(rs.getLong("id"));
+        user.setName(rs.getString("name"));
+        user.setNickname(rs.getString("nickname"));
+        user.setEmail(rs.getString("email"));
+        user.setPassword(rs.getString("password"));
+        user.setProfileImageUrl(rs.getString("profile_image_url"));
+        user.setInfo(rs.getString("info"));
+        user.setCreatedAt(rs.getString("created_at"));
+        return user;
+    };
 
     public boolean existsByEmail(String email) {
         String query = "SELECT COUNT(*) FROM user WHERE email = ?";
@@ -38,18 +51,7 @@ public class UserRepository {
     public User findByEmail(String email) {
         String query = "SELECT * FROM user WHERE email = ?";
         try {
-            return jdbcTemplate.queryForObject(query, new Object[]{email}, (rs, rowNum) -> {
-                User user = new User();
-                user.setId(rs.getLong("id"));
-                user.setName(rs.getString("name"));
-                user.setNickname(rs.getString("nickname"));
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
-                user.setProfileImageUrl(rs.getString("profile_image_url"));
-                user.setInfo(rs.getString("info"));
-                user.setCreatedAt(rs.getString("created_at"));
-                return user;
-            });
+            return jdbcTemplate.queryForObject(query, new Object[]{email}, USER_ROW_MAPPER);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -63,18 +65,15 @@ public class UserRepository {
     public List<User> findByNameOrNickname(String query) {
         String sql = "SELECT * FROM user WHERE name LIKE ? OR nickname LIKE ?";
         String likeQuery = "%" + query + "%";
-        return jdbcTemplate.query(sql, new Object[]{likeQuery, likeQuery}, (rs, rowNum) -> {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setName(rs.getString("name"));
-            user.setNickname(rs.getString("nickname"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setProfileImageUrl(rs.getString("profile_image_url"));
-            user.setInfo(rs.getString("info"));
-            user.setCreatedAt(rs.getString("created_at"));
-            return user;
-        });
+        return jdbcTemplate.query(sql, new Object[]{likeQuery, likeQuery}, USER_ROW_MAPPER);
     }
 
+    public User findById(Long id) {
+        String sql = "SELECT * FROM user WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{id}, USER_ROW_MAPPER);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 }

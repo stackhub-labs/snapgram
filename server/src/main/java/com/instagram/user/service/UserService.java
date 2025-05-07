@@ -1,14 +1,21 @@
 package com.instagram.user.service;
 
+import com.instagram.error.ErrorCode;
+import com.instagram.follow.repository.FollowRepository;
+import com.instagram.post.repository.PostRepository;
 import com.instagram.user.dto.LoginRequest;
 import com.instagram.user.dto.SignUpRequest;
 import com.instagram.user.model.User;
 import com.instagram.user.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import com.instagram.config.JwtProperties;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -22,10 +29,21 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {
+    private final PostRepository postRepository;
+    private final FollowRepository followRepository;
+
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtProperties jwtProperties,
+            PostRepository postRepository,
+            FollowRepository followRepository
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProperties = jwtProperties;
+        this.postRepository = postRepository;
+        this.followRepository = followRepository;
     }
 
     public boolean registerUser(SignUpRequest request) {
@@ -147,5 +165,30 @@ public class UserService {
 
     public List<User> searchUsersByNameOrNickname(String query) {
         return userRepository.findByNameOrNickname(query);
+    }
+
+    public Map<String, Object> getUserProfileById(Long userId) {
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        int postCount = postRepository.countByUserId(user.getId());
+        int followingCount = followRepository.countFollowing(user.getId());
+        int followerCount = followRepository.countFollowers(user.getId());
+        List<Map<String, Object>> posts = postRepository.findPostSummariesByUserId(user.getId());
+
+        Map<String, Object> userData = Map.of(
+                "id", user.getId(),
+                "name", user.getName(),
+                "nickname", user.getNickname(),
+                "email", user.getEmail(),
+                "post_count", postCount,
+                "following_count", followingCount,
+                "follower_count", followerCount,
+                "profile_image_url", Optional.ofNullable(user.getProfileImageUrl()).orElse("")
+        );
+
+        return Map.of("user", userData, "posts", posts);
     }
 }
