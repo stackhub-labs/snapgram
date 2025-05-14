@@ -18,13 +18,13 @@ public class PostRepository {
 
     public int countByUserId(Long userId) {
         String sql = "SELECT COUNT(*) FROM post WHERE user_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         return count != null ? count : 0;
     }
 
     public List<Map<String, Object>> findPostSummariesByUserId(Long userId) {
         String sql = "SELECT id, image_url FROM post WHERE user_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) -> mapToPostSummary(rs));
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapToPostSummary(rs), userId);
     }
 
     private Map<String, Object> mapToPostSummary(ResultSet rs) throws SQLException {

@@ -99,16 +99,13 @@ public class UserController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchUsers(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String nickname
+            @RequestParam(required = false) String query
     ) {
         try {
-            String query = name != null ? name : nickname;
-
             if (query == null || query.isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "code", ErrorCode.BAD_REQUEST,
-                        "message", "name 또는 nickname 파라미터가 필요합니다."
+                        "message", "검색어(query)가 필요합니다."
                 ));
             }
 

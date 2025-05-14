@@ -1,6 +1,6 @@
 package com.instagram.user.repository;
 
-import com.instagram.user.model.User; // ✅ 이 줄 추가
+import com.instagram.user.model.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,13 +31,13 @@ public class UserRepository {
 
     public boolean existsByEmail(String email) {
         String query = "SELECT COUNT(*) FROM user WHERE email = ?";
-        Integer count = jdbcTemplate.queryForObject(query, new Object[]{email}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, email);
         return count != null && count > 0;
     }
 
     public boolean existsByNickname(String nickname) {
         String query = "SELECT COUNT(*) FROM user WHERE nickname = ?";
-        Integer count = jdbcTemplate.queryForObject(query, new Object[]{nickname}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, nickname);
         return count != null && count > 0;
     }
 
@@ -51,7 +51,7 @@ public class UserRepository {
     public User findByEmail(String email) {
         String query = "SELECT * FROM user WHERE email = ?";
         try {
-            return jdbcTemplate.queryForObject(query, new Object[]{email}, USER_ROW_MAPPER);
+            return jdbcTemplate.queryForObject(query, USER_ROW_MAPPER, email);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -65,13 +65,13 @@ public class UserRepository {
     public List<User> findByNameOrNickname(String query) {
         String sql = "SELECT * FROM user WHERE name LIKE ? OR nickname LIKE ?";
         String likeQuery = "%" + query + "%";
-        return jdbcTemplate.query(sql, new Object[]{likeQuery, likeQuery}, USER_ROW_MAPPER);
+        return jdbcTemplate.query(sql, USER_ROW_MAPPER, likeQuery, likeQuery);
     }
 
     public User findById(Long id) {
         String sql = "SELECT * FROM user WHERE id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{id}, USER_ROW_MAPPER);
+            return jdbcTemplate.queryForObject(sql, USER_ROW_MAPPER, id);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

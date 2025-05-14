@@ -1,27 +1,23 @@
 package com.instagram.user.service;
 
-import com.instagram.error.ErrorCode;
 import com.instagram.follow.repository.FollowRepository;
 import com.instagram.post.repository.PostRepository;
 import com.instagram.user.dto.LoginRequest;
 import com.instagram.user.dto.SignUpRequest;
 import com.instagram.user.model.User;
 import com.instagram.user.repository.UserRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import com.instagram.config.JwtProperties;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class UserService {
@@ -116,7 +112,7 @@ public class UserService {
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
 

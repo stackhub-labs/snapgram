@@ -14,13 +14,13 @@ public class FollowRepository {
 
     public int countFollowing(Long userId) {
         String sql = "SELECT COUNT(*) FROM follow WHERE follower_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         return count != null ? count : 0;
     }
 
     public int countFollowers(Long userId) {
         String sql = "SELECT COUNT(*) FROM follow WHERE following_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         return count != null ? count : 0;
     }
 }

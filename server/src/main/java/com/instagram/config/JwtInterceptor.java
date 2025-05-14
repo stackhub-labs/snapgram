@@ -5,6 +5,7 @@ import io.jsonwebtoken.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.lang.NonNull;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +19,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -28,11 +29,12 @@ public class JwtInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String token = authHeader.substring(7); // "Bearer " 제거
+        String token = authHeader.substring(7);
 
         try {
-            Jwts.parser()
-                    .setSigningKey(jwtProperties.getSecretKey())
+            Jwts.parserBuilder()
+                    .setSigningKey(jwtProperties.getSecretKey().getBytes())
+                    .build()
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
