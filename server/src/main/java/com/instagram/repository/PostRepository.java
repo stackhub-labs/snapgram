@@ -1,4 +1,4 @@
-package com.instagram.post.repository;
+package com.instagram.repository;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

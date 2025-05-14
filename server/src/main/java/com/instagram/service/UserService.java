@@ -1,16 +1,17 @@
-package com.instagram.user.service;
+package com.instagram.service;
 
-import com.instagram.follow.repository.FollowRepository;
-import com.instagram.post.repository.PostRepository;
-import com.instagram.user.dto.LoginRequest;
-import com.instagram.user.dto.SignUpRequest;
-import com.instagram.user.model.User;
-import com.instagram.user.repository.UserRepository;
+import com.instagram.repository.FollowRepository;
+import com.instagram.repository.PostRepository;
+import com.instagram.repository.UserRepository;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import com.instagram.config.JwtProperties;
+import com.instagram.dto.LoginRequest;
+import com.instagram.dto.SignUpRequest;
+import com.instagram.model.User;
 
 import java.security.SecureRandom;
 import java.util.*;

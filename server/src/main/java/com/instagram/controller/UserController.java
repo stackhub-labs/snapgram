@@ -1,10 +1,11 @@
-package com.instagram.user.controller;
+package com.instagram.controller;
 
+import com.instagram.dto.LoginRequest;
+import com.instagram.dto.SignUpRequest;
 import com.instagram.error.ErrorCode;
-import com.instagram.user.dto.LoginRequest;
-import com.instagram.user.dto.SignUpRequest;
-import com.instagram.user.model.User;
-import com.instagram.user.service.UserService;
+import com.instagram.model.User;
+import com.instagram.service.UserService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

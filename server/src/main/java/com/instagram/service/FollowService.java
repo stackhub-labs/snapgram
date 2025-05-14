@@ -1,8 +1,9 @@
-package com.instagram.follow.service;
+package com.instagram.service;
 
 import com.instagram.error.ErrorCode;
-import com.instagram.follow.repository.FollowRepository;
-import com.instagram.user.repository.UserRepository;
+import com.instagram.repository.FollowRepository;
+import com.instagram.repository.UserRepository;
+
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,4 +1,4 @@
-package com.instagram.user.dto;
+package com.instagram.dto;
 
 public class LoginRequest {
     private String email;

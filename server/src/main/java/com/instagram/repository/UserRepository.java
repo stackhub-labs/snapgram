@@ -1,10 +1,11 @@
-package com.instagram.user.repository;
+package com.instagram.repository;
 
-import com.instagram.user.model.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import com.instagram.model.User;
 
 import java.util.List;
 @Repository

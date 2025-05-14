@@ -1,4 +1,4 @@
-package com.instagram.user.model;
+package com.instagram.model;
 
 public class User {
     private Long id;

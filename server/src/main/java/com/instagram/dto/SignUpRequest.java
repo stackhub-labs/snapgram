@@ -1,7 +1,7 @@
-package com.instagram.user.dto;
+package com.instagram.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.instagram.user.model.User;
+import com.instagram.model.User;
 
 public class SignUpRequest {
     private String name;
