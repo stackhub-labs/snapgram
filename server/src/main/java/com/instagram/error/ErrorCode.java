@@ -12,6 +12,8 @@ public class ErrorCode {
     public static final int PASSWORD_MISMATCH = 1007;
     public static final int NO_USERS_FOUND = 1008;
     public static final int BAD_REQUEST = 1009;
+    public static final int ALREADY_FOLLOWING = 1010;
+    public static final int SELF_FOLLOW_NOT_ALLOWED = 1011;
 
     public static final int INTERNAL_SERVER_ERROR = 2001;
 

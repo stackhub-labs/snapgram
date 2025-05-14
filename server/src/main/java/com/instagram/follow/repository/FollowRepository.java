@@ -23,4 +23,15 @@ public class FollowRepository {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
         return count != null ? count : 0;
     }
+
+    public void follow(Long followerId, Long followingId) {
+        String sql = "INSERT INTO follow (follower_id, following_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, followerId, followingId);
+    }
+
+    public boolean isAlreadyFollowing(Long followerId, Long followingId) {
+        String sql = "SELECT COUNT(*) FROM follow WHERE follower_id = ? AND following_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, followerId, followingId);
+        return count != null && count > 0;
+    }
 }

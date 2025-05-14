@@ -156,7 +156,4 @@ public class UserController {
                     .body(Map.of("code", ErrorCode.INTERNAL_SERVER_ERROR, "message", "예상치 못한 오류가 발생했습니다."));
         }
     }
-
-
-
 }
