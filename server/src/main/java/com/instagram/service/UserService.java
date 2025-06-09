@@ -1,27 +1,26 @@
 package com.instagram.service;
 
-import com.instagram.repository.FollowRepository;
-import com.instagram.repository.PostRepository;
-import com.instagram.repository.UserRepository;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import com.instagram.config.JwtProperties;
 import com.instagram.dto.LoginRequest;
 import com.instagram.dto.SignUpRequest;
 import com.instagram.model.User;
-
+import com.instagram.repository.FollowRepository;
+import com.instagram.repository.PostRepository;
+import com.instagram.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.nio.charset.StandardCharsets;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProperties jwtProperties;
@@ -30,11 +29,11 @@ public class UserService {
     private final FollowRepository followRepository;
 
     public UserService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtProperties jwtProperties,
-            PostRepository postRepository,
-            FollowRepository followRepository
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder,
+        JwtProperties jwtProperties,
+        PostRepository postRepository,
+        FollowRepository followRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -61,7 +60,9 @@ public class UserService {
         }
 
         if (!isValidPassword(request.getPassword())) {
-            throw new IllegalArgumentException("Password must contain at least one special character, one letter, and one number, and be at least 8 characters long.");
+            throw new IllegalArgumentException(
+                "Password must contain at least one special character, one letter, and one number, and be at least 8 characters long."
+            );
         }
 
         User user = request.toEntity();
@@ -109,12 +110,14 @@ public class UserService {
         claims.put("nickname", user.getNickname());
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(user.getEmail())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
-                .signWith(Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8)))
-                .compact();
+            .setClaims(claims)
+            .setSubject(user.getEmail())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTime()))
+            .signWith(
+                Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8))
+            )
+            .compact();
     }
 
     public String resetPassword(String email) {
@@ -150,14 +153,13 @@ public class UserService {
             password.append(all.charAt(random.nextInt(all.length())));
         }
 
-        List<Character> pwdChars = password.chars()
-                .mapToObj(c -> (char) c)
-                .collect(Collectors.toList());
+        List<Character> pwdChars = password
+            .chars()
+            .mapToObj(c -> (char) c)
+            .collect(Collectors.toList());
         Collections.shuffle(pwdChars, random);
 
-        return pwdChars.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining());
+        return pwdChars.stream().map(String::valueOf).collect(Collectors.joining());
     }
 
     public List<User> searchUsersByNameOrNickname(String query) {
@@ -176,14 +178,22 @@ public class UserService {
         List<Map<String, Object>> posts = postRepository.findPostSummariesByUserId(user.getId());
 
         Map<String, Object> userData = Map.of(
-                "id", user.getId(),
-                "name", user.getName(),
-                "nickname", user.getNickname(),
-                "email", user.getEmail(),
-                "post_count", postCount,
-                "following_count", followingCount,
-                "follower_count", followerCount,
-                "profile_image_url", Optional.ofNullable(user.getProfileImageUrl()).orElse("")
+            "id",
+            user.getId(),
+            "name",
+            user.getName(),
+            "nickname",
+            user.getNickname(),
+            "email",
+            user.getEmail(),
+            "post_count",
+            postCount,
+            "following_count",
+            followingCount,
+            "follower_count",
+            followerCount,
+            "profile_image_url",
+            Optional.ofNullable(user.getProfileImageUrl()).orElse("")
         );
 
         return Map.of("user", userData, "posts", posts);

@@ -1,11 +1,10 @@
 package com.instagram.repository;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-
-import java.util.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class PostRepository {

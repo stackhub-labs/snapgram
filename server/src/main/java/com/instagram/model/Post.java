@@ -1,14 +1,14 @@
 package com.instagram.model;
 
 public class Post {
+
     private Long id;
     private Long userId;
     private String content;
     private String imageUrl;
     private String createdAt;
 
-    public Post() {
-    }
+    public Post() {}
 
     public Post(Long userId, String content, String imageUrl) {
         this.userId = userId;

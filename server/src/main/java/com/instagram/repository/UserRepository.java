@@ -1,13 +1,12 @@
 package com.instagram.repository;
 
+import com.instagram.model.User;
+import java.util.List;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import com.instagram.model.User;
-
-import java.util.List;
 @Repository
 public class UserRepository {
 
@@ -43,10 +42,18 @@ public class UserRepository {
     }
 
     public void save(User user) {
-        String query = "INSERT INTO user (name, nickname, email, password, profile_image_url, info) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, user.getName(), user.getNickname(), user.getEmail(),
-                user.getPassword(), user.getProfileImageUrl(), user.getInfo());
+        String query =
+            "INSERT INTO user (name, nickname, email, password, profile_image_url, info) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(
+            query,
+            user.getName(),
+            user.getNickname(),
+            user.getEmail(),
+            user.getPassword(),
+            user.getProfileImageUrl(),
+            user.getInfo()
+        );
     }
 
     public User findByEmail(String email) {
