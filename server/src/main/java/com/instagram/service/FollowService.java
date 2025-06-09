@@ -36,6 +36,24 @@ public class FollowService {
         
         followRepository.follow(currentUserId, userId);
     }
+
+    public void unfollowUser(Long userId) {
+        Long currentUserId = getCurrentAuthenticatedUserId();
+        
+        if (userId.equals(currentUserId)) {
+            throw new IllegalArgumentException("SELF_FOLLOW_NOT_ALLOWED:" + ErrorCode.SELF_FOLLOW_NOT_ALLOWED);
+        }
+        
+        if (userRepository.findById(userId) == null) {
+            throw new IllegalArgumentException("USER_NOT_FOUND:" + ErrorCode.USER_NOT_FOUND);
+        }
+        
+        if (!followRepository.isAlreadyFollowing(currentUserId, userId)) {
+            throw new IllegalArgumentException("NOT_FOLLOWING:" + ErrorCode.NOT_FOLLOWING);
+        }
+        
+        followRepository.unfollow(currentUserId, userId);
+    }
     
     // 실제 구현에서는 Spring Security를 사용하여 현재 인증된 사용자의 ID를 가져와야 함
     private Long getCurrentAuthenticatedUserId() {
