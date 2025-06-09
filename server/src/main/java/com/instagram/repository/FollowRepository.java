@@ -34,4 +34,9 @@ public class FollowRepository {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, followerId, followingId);
         return count != null && count > 0;
     }
+
+    public void unfollow(Long followerId, Long followingId) {
+        String sql = "DELETE FROM follow WHERE follower_id = ? AND following_id = ?";
+        jdbcTemplate.update(sql, followerId, followingId);
+    }
 }

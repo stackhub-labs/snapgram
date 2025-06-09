@@ -33,4 +33,9 @@ public class PostRepository {
         post.put("image_url", rs.getString("image_url"));
         return post;
     }
+
+    public void save(Long userId, String content, String imageUrl) {
+        String sql = "INSERT INTO post (user_id, content, image_url) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, userId, content, imageUrl);
+    }
 }
