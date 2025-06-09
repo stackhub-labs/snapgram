@@ -32,10 +32,18 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = authHeader.substring(7);
 
         try {
-            Jwts.parserBuilder()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(jwtProperties.getSecretKey().getBytes())
                     .build()
-                    .parseClaimsJws(token);
+                    .parseClaimsJws(token)
+                    .getBody();
+            
+            // 사용자 정보를 request attribute에 저장
+            Long userId = Long.valueOf(claims.get("id").toString());
+            request.setAttribute("userId", userId);
+            request.setAttribute("userEmail", claims.get("email"));
+            request.setAttribute("userNickname", claims.get("nickname"));
+            
             return true;
         } catch (JwtException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
