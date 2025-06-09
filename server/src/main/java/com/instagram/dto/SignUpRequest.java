@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.instagram.model.User;
 
 public class SignUpRequest {
+
     private String name;
     private String email;
     private String password;
     private String nickname;
+
     @JsonProperty("is_agree")
     private boolean isAgree;
 

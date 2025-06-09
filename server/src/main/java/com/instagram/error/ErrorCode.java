@@ -1,6 +1,7 @@
 package com.instagram.error;
 
 public class ErrorCode {
+
     public static final int SUCCESS = 0;
 
     public static final int EMAIL_ALREADY_EXISTS = 1001;
