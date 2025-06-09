@@ -1,4 +1,4 @@
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Header from "../common/Header.jsx";
 import axios from "axios";
@@ -10,9 +10,38 @@ const UserFeed = () => {
     const token = localStorage.getItem("token");
     const [posts, setPosts] = useState([]);
     const [isFollowing, setIsFollowing] = useState(false);
+    const loggedInUserId = localStorage.getItem("userId");
+    const navigate = useNavigate();
     const requestData = {
         user_id: userData?.id,
     }
+
+    // 가상 데이터
+    const mockPosts = [
+  { id: 1, image_url: "https://via.placeholder.com/200?text=Post+1" },
+  { id: 2, image_url: "https://via.placeholder.com/200?text=Post+2" },
+  { id: 3, image_url: "https://via.placeholder.com/200?text=Post+3" },
+];
+
+  const mockUser = {
+    id: 1,
+    profile_image_url: "https://via.placeholder.com/100",
+    name: "홍길동",
+    nickname: "hong",
+    post_count: 5,
+    following_count: 10,
+    follower_count: 15,
+    is_following: false,
+  };
+
+    useEffect(() => {
+    setUserData(mockUser);
+    setPosts(mockPosts);
+    setIsFollowing(mockUser.is_following);
+  }, [id]);
+  
+  
+  // 위까지
 
     const handleFollow = async () => {
         if (!userData) return;
@@ -57,6 +86,9 @@ const UserFeed = () => {
         }
     };
 
+    const handleWrite = () => {
+        navigate("/post");
+    }
 
 
     // 실제 서버 연결
@@ -88,8 +120,11 @@ const UserFeed = () => {
                 <p>게시물 수: {userData.post_count}</p>
                 <p>팔로잉: {userData.following_count}</p>
                 <p>팔로워: {userData.follower_count}</p>
-                <p>게시물: {userData.posts}</p>
-                <Button onClick= {handleFollow} text={isFollowing ? "unfollow" : "follow"} />
+                <div style={{ display: "flex", gap: "10px", marginLeft: "33px"}}>
+                    <Button onClick= {handleFollow} text={isFollowing ? "unfollow" : "follow"} style={{width: "90px"}}/>
+                    {loggedInUserId === userData.id.toString() && <Button onClick= {handleWrite} text={"게시물 작성"} style={{width: "90px"}}/>}
+                </div>
+                <p>{userData.posts}</p>
             </div>
             <div>
                 <h3>게시물</h3>
