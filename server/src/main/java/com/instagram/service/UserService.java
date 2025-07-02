@@ -17,6 +17,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UserService {
@@ -178,6 +181,15 @@ public class UserService {
         int followerCount = followRepository.countFollowers(user.getId());
         List<Map<String, Object>> posts = postRepository.findPostSummariesByUserId(user.getId());
 
+        // 현재 로그인한 사용자 ID 가져오기
+        Long currentUserId = getCurrentAuthenticatedUserId();
+        
+        // 팔로우 상태 확인 (자신을 팔로우하는 경우는 false)
+        boolean isFollowing = false;
+        if (!currentUserId.equals(userId)) {
+            isFollowing = followRepository.isAlreadyFollowing(currentUserId, userId);
+        }
+
         Map<String, Object> userData = Map.of(
             "id",
             user.getId(),
@@ -194,9 +206,28 @@ public class UserService {
             "follower_count",
             followerCount,
             "profile_image_url",
-            Optional.ofNullable(user.getProfileImageUrl()).orElse("")
+            Optional.ofNullable(user.getProfileImageUrl()).orElse(""),
+            "is_following",
+            isFollowing
         );
 
         return Map.of("user", userData, "posts", posts);
+    }
+
+    private Long getCurrentAuthenticatedUserId() {
+        ServletRequestAttributes attributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            throw new IllegalStateException("현재 HTTP 요청을 찾을 수 없습니다.");
+        }
+
+        HttpServletRequest request = attributes.getRequest();
+        Long userId = (Long) request.getAttribute("userId");
+
+        if (userId == null) {
+            throw new IllegalStateException("인증된 사용자 정보를 찾을 수 없습니다.");
+        }
+
+        return userId;
     }
 }
