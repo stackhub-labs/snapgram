@@ -72,7 +72,7 @@ public class UserService {
         return true;
     }
 
-    public String loginUser(LoginRequest request) {
+    public Map<String, Object> loginUser(LoginRequest request) {
         if (!isValidEmail(request.getEmail())) {
             throw new IllegalArgumentException("Invalid email format");
         }
@@ -86,7 +86,8 @@ public class UserService {
             throw new IllegalArgumentException("Password mismatch");
         }
 
-        return generateToken(user);
+        String token = generateToken(user);
+        return Map.of("token", token, "user_id", user.getId());
     }
 
     private boolean isValidEmail(String email) {

@@ -94,8 +94,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
         try {
-            String token = userService.loginUser(request);
-            return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS, "data", token));
+            Map<String, Object> loginResult = userService.loginUser(request);
+            return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS, "data", loginResult));
         } catch (IllegalArgumentException e) {
             String message = e.getMessage();
             if (message.contains("Invalid email format")) {
