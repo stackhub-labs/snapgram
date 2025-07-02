@@ -35,4 +35,24 @@ public class PostController {
                 );
         }
     }
+
+    @GetMapping("/post")
+    public ResponseEntity<Object> getPostsByFollowingUsers(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            Map<String, Object> response = postService.getPostsByFollowingUsers(page, size);
+            return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS, "data", response));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(
+                    Map.of(
+                        "code",
+                        ErrorCode.INTERNAL_SERVER_ERROR,
+                        "message",
+                        "예상치 못한 오류가 발생했습니다."
+                    )
+                );
+        }
+    }
 }

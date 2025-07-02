@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class PostService {
@@ -19,6 +21,21 @@ public class PostService {
     public void createPost(PostRequest request) {
         Long currentUserId = getCurrentAuthenticatedUserId();
         postRepository.save(currentUserId, request.getContent(), request.getImageUrl());
+    }
+
+    public Map<String, Object> getPostsByFollowingUsers(int page, int size) {
+        Long currentUserId = getCurrentAuthenticatedUserId();
+        
+        int offset = (page - 1) * size;
+        List<Map<String, Object>> posts = postRepository.findPostsByFollowingUsers(currentUserId, offset, size);
+        int total = postRepository.countPostsByFollowingUsers(currentUserId);
+        
+        return Map.of(
+            "posts", posts,
+            "page", page,
+            "size", size,
+            "total", total
+        );
     }
 
     private Long getCurrentAuthenticatedUserId() {
