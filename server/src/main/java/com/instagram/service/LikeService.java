@@ -1,41 +1,41 @@
 package com.instagram.service;
 
-import com.instagram.dto.PostRequest;
+import com.instagram.repository.LikeRepository;
 import com.instagram.repository.PostRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import java.util.List;
-import java.util.Map;
 
 @Service
-public class PostService {
+public class LikeService {
 
+    private final LikeRepository likeRepository;
     private final PostRepository postRepository;
 
-    public PostService(PostRepository postRepository) {
+    public LikeService(LikeRepository likeRepository, PostRepository postRepository) {
+        this.likeRepository = likeRepository;
         this.postRepository = postRepository;
     }
 
-    public void createPost(PostRequest request) {
+    public void toggleLike(Long postId) {
         Long currentUserId = getCurrentAuthenticatedUserId();
-        postRepository.save(currentUserId, request.getContent(), request.getImageUrl());
-    }
+        
+        // 게시글이 존재하는지 확인
+        if (!postRepository.existsById(postId)) {
+            throw new IllegalArgumentException("게시글을 찾을 수 없습니다.");
+        }
 
-    public Map<String, Object> getPostsByFollowingUsers(int page, int size) {
-        Long currentUserId = getCurrentAuthenticatedUserId();
+        // 이미 좋아요를 눌렀는지 확인
+        boolean isLiked = likeRepository.isLikedByUser(currentUserId, postId);
         
-        int offset = (page - 1) * size;
-        List<Map<String, Object>> posts = postRepository.findPostsByFollowingUsers(currentUserId, offset, size);
-        int total = postRepository.countPostsByFollowingUsers(currentUserId);
-        
-        return Map.of(
-            "posts", posts,
-            "page", page,
-            "size", size,
-            "total", total
-        );
+        if (isLiked) {
+            // 좋아요 취소
+            likeRepository.unlike(currentUserId, postId);
+        } else {
+            // 좋아요 추가
+            likeRepository.like(currentUserId, postId);
+        }
     }
 
     private Long getCurrentAuthenticatedUserId() {
@@ -54,4 +54,4 @@ public class PostService {
 
         return userId;
     }
-}
+} 
