@@ -4,8 +4,9 @@ import DefaultProfileImage from "../../assets/non-profile.svg";
 import "../pages/MainFeedPage.css";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import Header from "../common/Header.jsx";
 
-const MainFeed = () => {
+const MainFeedSearch = () => {
 
     const token = localStorage.getItem("token");
 
@@ -15,8 +16,6 @@ const MainFeed = () => {
     const navigate = useNavigate();
 
     const fetchSearchUsers = async(query) => {
-        console.log("검색어:", query);
-
         if (!query) {
             setUsers([]);
             return;
@@ -30,6 +29,7 @@ const MainFeed = () => {
                     Authorization: `Bearer ${token}`
                 }
             });
+            console.log(token);
             const {code, data} = response.data;
 
             if (code === 0) {
@@ -45,6 +45,7 @@ const MainFeed = () => {
     };
     return(
         <div>
+            <Header text="Snapgram"/>
             <Search onSearch={fetchSearchUsers}/>
             <ul className="search-results">
                 {users && users.length > 0 ? (
@@ -68,4 +69,4 @@ const MainFeed = () => {
     );
 }
 
-export default MainFeed;
+export default MainFeedSearch;

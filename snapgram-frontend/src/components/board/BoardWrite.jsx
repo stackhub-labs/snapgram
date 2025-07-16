@@ -11,6 +11,7 @@ const BoardWrite = () => {
     const [preview, setPreview] = useState(null);
     const [imageFile, setImageFile] = useState(null);
     const [content, setContent] = useState("");
+    const token = localStorage.getItem("token");
     
     const handleFileChange = (e) => {
         const img = e.target.files[0];
@@ -27,20 +28,24 @@ const BoardWrite = () => {
         // console.log("📤 content:", content);
         // console.log("📷 imageFile:", imageFile);
         // console.log("📦 formData entries:");
-        
+        //
         // for (let pair of formData.entries()) {
         //     console.log(pair[0]+ ':', pair[1]);
         // }
-        
-        formData.append("content", content);
-        if (imageFile) {
-            formData.append("file", imageFile);
+        const requestData = {
+            content: content,
+            image_url: imageFile.name
         }
+        // formData.append("content", content);
+        // if (imageFile) {
+        //     formData.append("image_url", imageFile.name);
+        // }
+        // console.log(formData);
         
         try {
-            const response = await axios.post("http://192.168.0.18:8080/api/post", formData, {
+            const response = await axios.post("http://192.168.0.18:8080/api/post", requestData, {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`
                 },
             });
 
