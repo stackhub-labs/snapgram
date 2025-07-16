@@ -10,9 +10,11 @@ import org.springframework.stereotype.Repository;
 public class PostRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final LikeRepository likeRepository;
 
-    public PostRepository(JdbcTemplate jdbcTemplate) {
+    public PostRepository(JdbcTemplate jdbcTemplate, LikeRepository likeRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.likeRepository = likeRepository;
     }
 
     public int countByUserId(Long userId) {
@@ -53,7 +55,7 @@ public class PostRepository {
             LIMIT ? OFFSET ?
             """;
         
-        return jdbcTemplate.query(sql, (rs, rowNum) -> mapToPostWithUser(rs), currentUserId, limit, offset);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapToPostWithUser(rs, currentUserId), currentUserId, limit, offset);
     }
 
     public int countPostsByFollowingUsers(Long currentUserId) {
@@ -71,7 +73,13 @@ public class PostRepository {
         return count != null ? count : 0;
     }
 
-    private Map<String, Object> mapToPostWithUser(ResultSet rs) throws SQLException {
+    public boolean existsById(Long postId) {
+        String sql = "SELECT COUNT(*) FROM post WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, postId);
+        return count != null && count > 0;
+    }
+
+    private Map<String, Object> mapToPostWithUser(ResultSet rs, Long currentUserId) throws SQLException {
         Map<String, Object> post = new HashMap<>();
         post.put("id", rs.getLong("id"));
         post.put("content", rs.getString("content"));
@@ -84,9 +92,14 @@ public class PostRepository {
         user.put("username", rs.getString("username"));
         post.put("user", user);
         
-        // 임시로 0으로 설정 (나중에 실제 like, comment 테이블이 생기면 수정)
-        post.put("like_count", 0);
-        post.put("comment_count", 0);
+        // 좋아요 수와 현재 사용자의 좋아요 여부
+        Long postId = rs.getLong("id");
+        int likeCount = likeRepository.countLikesByPostId(postId);
+        boolean isLiked = likeRepository.isLikedByUser(currentUserId, postId);
+        
+        post.put("like_count", likeCount);
+        post.put("is_like", isLiked);
+        post.put("comment_count", 0); // 댓글 기능은 아직 구현되지 않음
         
         return post;
     }
