@@ -27,6 +27,24 @@ public class CommentService {
         commentRepository.save(currentUserId, postId, content);
     }
 
+    public void deleteComment(Long commentId) {
+        Long currentUserId = getCurrentAuthenticatedUserId();
+        
+        // 댓글이 존재하는지 확인
+        if (!commentRepository.existsById(commentId)) {
+            throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
+        }
+
+        // 댓글 작성자인지 확인
+        Long commentUserId = commentRepository.getCommentUserId(commentId);
+        if (!currentUserId.equals(commentUserId)) {
+            throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다.");
+        }
+
+        // 댓글 삭제
+        commentRepository.deleteById(commentId);
+    }
+
     private Long getCurrentAuthenticatedUserId() {
         ServletRequestAttributes attributes =
             (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

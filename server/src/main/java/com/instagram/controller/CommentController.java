@@ -39,4 +39,24 @@ public class CommentController {
                 ));
         }
     }
+
+    @DeleteMapping("/comment/{comment_id}")
+    public ResponseEntity<Object> deleteComment(@PathVariable("comment_id") Long commentId) {
+        try {
+            commentService.deleteComment(commentId);
+            return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of(
+                    "code", ErrorCode.BAD_REQUEST,
+                    "message", e.getMessage()
+                ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of(
+                    "code", ErrorCode.INTERNAL_SERVER_ERROR,
+                    "message", "예상치 못한 오류가 발생했습니다."
+                ));
+        }
+    }
 } 
