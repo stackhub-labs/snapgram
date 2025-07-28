@@ -11,10 +11,12 @@ public class PostRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
-    public PostRepository(JdbcTemplate jdbcTemplate, LikeRepository likeRepository) {
+    public PostRepository(JdbcTemplate jdbcTemplate, LikeRepository likeRepository, CommentRepository commentRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.likeRepository = likeRepository;
+        this.commentRepository = commentRepository;
     }
 
     public int countByUserId(Long userId) {
@@ -99,7 +101,7 @@ public class PostRepository {
         
         post.put("like_count", likeCount);
         post.put("is_like", isLiked);
-        post.put("comment_count", 0); // 댓글 기능은 아직 구현되지 않음
+        post.put("comment_count", commentRepository.countCommentsByPostId(postId));
         
         return post;
     }
