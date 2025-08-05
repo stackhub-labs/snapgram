@@ -59,4 +59,27 @@ public class CommentController {
                 ));
         }
     }
+
+    @GetMapping("/comment/{post_id}")
+    public ResponseEntity<Object> getCommentsByPostId(@PathVariable("post_id") Long postId) {
+        try {
+            Map<String, Object> response = commentService.getCommentsByPostId(postId);
+            return ResponseEntity.ok().body(Map.of(
+                "code", ErrorCode.SUCCESS,
+                "data", response
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of(
+                    "code", ErrorCode.BAD_REQUEST,
+                    "message", e.getMessage()
+                ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of(
+                    "code", ErrorCode.INTERNAL_SERVER_ERROR,
+                    "message", "예상치 못한 오류가 발생했습니다."
+                ));
+        }
+    }
 } 
