@@ -105,4 +105,33 @@ public class PostRepository {
         
         return post;
     }
+
+    public List<Map<String, Object>> findPostsByUserId(Long userId) {
+        String sql = """
+            SELECT p.id, p.content, p.image_url, p.created_at
+            FROM post p
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC
+            """;
+        
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapToPostSummary(rs, userId), userId);
+    }
+
+    private Map<String, Object> mapToPostSummary(ResultSet rs, Long userId) throws SQLException {
+        Map<String, Object> post = new HashMap<>();
+        post.put("id", rs.getLong("id"));
+        post.put("content", rs.getString("content"));
+        post.put("image_url", rs.getString("image_url"));
+        post.put("created_at", rs.getString("created_at"));
+        
+        // 좋아요 수와 댓글 수
+        Long postId = rs.getLong("id");
+        int likeCount = likeRepository.countLikesByPostId(postId);
+        int commentCount = commentRepository.countCommentsByPostId(postId);
+        
+        post.put("like_count", likeCount);
+        post.put("comment_count", commentCount);
+        
+        return post;
+    }
 }

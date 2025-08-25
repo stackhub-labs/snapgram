@@ -3,6 +3,7 @@ package com.instagram.controller;
 import com.instagram.dto.PostRequest;
 import com.instagram.error.ErrorCode;
 import com.instagram.service.PostService;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,24 @@ public class PostController {
         try {
             Map<String, Object> response = postService.getPostsByFollowingUsers(page, size);
             return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS, "data", response));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(
+                    Map.of(
+                        "code",
+                        ErrorCode.INTERNAL_SERVER_ERROR,
+                        "message",
+                        "예상치 못한 오류가 발생했습니다."
+                    )
+                );
+        }
+    }
+
+    @GetMapping("/user/post")
+    public ResponseEntity<Object> getPostsByUserId(@RequestParam("user_id") Long userId) {
+        try {
+            List<Map<String, Object>> posts = postService.getPostsByUserId(userId);
+            return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS, "data", posts));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                 .body(

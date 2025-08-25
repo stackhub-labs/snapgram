@@ -38,6 +38,11 @@ public class PostService {
         );
     }
 
+    public List<Map<String, Object>> getPostsByUserId(Long userId) {
+        List<Map<String, Object>> posts = postRepository.findPostsByUserId(userId);
+        return posts;
+    }
+
     private Long getCurrentAuthenticatedUserId() {
         ServletRequestAttributes attributes =
             (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
