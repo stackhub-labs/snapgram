@@ -1,5 +1,6 @@
 package com.instagram.controller;
 
+import com.instagram.dto.PostLikeResponse;
 import com.instagram.error.ErrorCode;
 import com.instagram.service.LikeService;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,29 @@ public class LikeController {
             
             likeService.toggleLike(postId);
             return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of(
+                    "code", ErrorCode.BAD_REQUEST,
+                    "message", e.getMessage()
+                ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Map.of(
+                    "code", ErrorCode.INTERNAL_SERVER_ERROR,
+                    "message", "예상치 못한 오류가 발생했습니다."
+                ));
+        }
+    }
+
+    @GetMapping("/post/like")
+    public ResponseEntity<Object> getPostLikes(@RequestParam("post_id") Long postId) {
+        try {
+            PostLikeResponse response = likeService.getPostLikes(postId);
+            return ResponseEntity.ok().body(Map.of(
+                "code", ErrorCode.SUCCESS,
+                "data", response
+            ));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
                 .body(Map.of(
