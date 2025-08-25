@@ -74,4 +74,27 @@ public class PostController {
                 );
         }
     }
+
+    @DeleteMapping("/post")
+    public ResponseEntity<Object> deletePost(@RequestParam("post_id") Long postId) {
+        try {
+            boolean deleted = postService.deletePost(postId);
+            if (deleted) {
+                return ResponseEntity.ok().body(Map.of("code", ErrorCode.SUCCESS));
+            } else {
+                return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "code", ErrorCode.BAD_REQUEST,
+                        "message", "게시물을 찾을 수 없거나 삭제 권한이 없습니다."
+                    ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // 서버 로그에 에러 출력
+            return ResponseEntity.internalServerError()
+                .body(Map.of(
+                    "code", ErrorCode.INTERNAL_SERVER_ERROR,
+                    "message", "예상치 못한 오류가 발생했습니다: " + e.getMessage()
+                ));
+        }
+    }
 }

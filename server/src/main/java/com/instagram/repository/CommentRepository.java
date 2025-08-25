@@ -69,4 +69,9 @@ public class CommentRepository {
             return comment;
         }, postId);
     }
+
+    public void deleteCommentsByPostId(Long postId) {
+        String sql = "DELETE FROM comment WHERE post_id = ?";
+        jdbcTemplate.update(sql, postId);
+    }
 } 

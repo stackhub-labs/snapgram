@@ -44,4 +44,9 @@ public class LikeRepository {
                     "ORDER BY l.user_id";
         return jdbcTemplate.queryForList(sql, postId);
     }
+
+    public void deleteLikesByPostId(Long postId) {
+        String sql = "DELETE FROM `like` WHERE post_id = ?";
+        jdbcTemplate.update(sql, postId);
+    }
 } 

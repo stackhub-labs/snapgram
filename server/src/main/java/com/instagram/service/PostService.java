@@ -43,6 +43,11 @@ public class PostService {
         return posts;
     }
 
+    public boolean deletePost(Long postId) {
+        Long currentUserId = getCurrentAuthenticatedUserId();
+        return postRepository.deletePost(postId, currentUserId);
+    }
+
     private Long getCurrentAuthenticatedUserId() {
         ServletRequestAttributes attributes =
             (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

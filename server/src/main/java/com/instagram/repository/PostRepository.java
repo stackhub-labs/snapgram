@@ -134,4 +134,24 @@ public class PostRepository {
         
         return post;
     }
+
+    public boolean deletePost(Long postId, Long userId) {
+        // 게시물이 존재하고 해당 사용자의 것인지 확인
+        String checkSql = "SELECT COUNT(*) FROM post WHERE id = ? AND user_id = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, postId, userId);
+        
+        if (count == null || count == 0) {
+            return false;
+        }
+
+        // 관련된 좋아요와 댓글 먼저 삭제
+        likeRepository.deleteLikesByPostId(postId);
+        commentRepository.deleteCommentsByPostId(postId);
+        
+        // 게시물 삭제
+        String deleteSql = "DELETE FROM post WHERE id = ? AND user_id = ?";
+        int deletedRows = jdbcTemplate.update(deleteSql, postId, userId);
+        
+        return deletedRows > 0;
+    }
 }
