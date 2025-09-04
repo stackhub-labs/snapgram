@@ -21,11 +21,4 @@ public class WebConfig implements WebMvcConfigurer {
             .addInterceptor(jwtInterceptor)
             .addPathPatterns("/api/user/search", "/api/user/profile", "/api/post/**", "/api/user/post", "/api/follow", "/api/like", "/api/post/like", "/api/comment/**");
     }
-    
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 이미지 파일을 정적 리소스로 서빙
-        registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:uploads/images/");
-    }
 }
